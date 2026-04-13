@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Aurum Vault</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      background-color: #0b0b0b;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      padding: 20px;
+      color: gold;
+    }
+
+    .card {
+      background: #111;
+      border: 1px solid gold;
+      padding: 20px;
+      margin: 20px;
+      border-radius: 10px;
+    }
+
+    button {
+      background: gold;
+      color: black;
+      padding: 12px 15px;
+      margin: 10px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.8;
+    }
+
+    .loader {
+      border: 6px solid #222;
+      border-top: 6px solid gold;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: 100px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="loader" class="loader"></div>
+
+<h1>Aurum Vault</h1>
+
+<div class="card">
+  <h2>Welcome 👋</h2>
+  <p>Wallet Balance: ₦<span id="balance">0</span></p>
+</div>
+
+<div class="card">
+  <h3>Gold Price</h3>
+  <p>$<span id="goldPrice">Loading...</span> / oz</p>
+</div>
+
+<button onclick="deposit(500)">Deposit ₦500</button>
+<button onclick="withdraw(200)">Withdraw ₦200</button>
+
+<script>
+  // Hide loader
+  window.onload = function () {
+    document.getElementById("loader").style.display = "none";
+  };
+
+  // Wallet setup
+  if (!localStorage.getItem("balance")) {
+    localStorage.setItem("balance", 1000);
+  }
+
+  function updateBalance() {
+    document.getElementById("balance").innerText = localStorage.getItem("balance");
+  }
+
+  updateBalance();
+
+  function deposit(amount) {
+    let bal = parseInt(localStorage.getItem("balance"));
+    bal += amount;
+    localStorage.setItem("balance", bal);
+    updateBalance();
+  }
+
+  function withdraw(amount) {
+    let bal = parseInt(localStorage.getItem("balance"));
+    if (bal >= amount) {
+      bal -= amount;
+      localStorage.setItem("balance", bal);
+      updateBalance();
+    } else {
+      alert("Insufficient funds");
+    }
+  }
+
+  // Gold price API
+  fetch("https://api.metals.live/v1/spot/gold")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("goldPrice").innerText = data[0].price;
+    })
+    .catch(() => {
+      document.getElementById("goldPrice").innerText = "Unavailable";
+    });
+</script>
+
+</body>
+</html>
